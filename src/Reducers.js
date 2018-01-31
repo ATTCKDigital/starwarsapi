@@ -1,11 +1,13 @@
-import R from 'ramda';
-import { uriToId } from './Utils';
+import * as R from 'ramda';
+import { combineReducers } from 'redux'
+import { filmListToIds, personUriToId } from './Utils';
 import {
   REQUEST_PEOPLE,
   RECEIVE_PEOPLE,
   REQUEST_FILM,
   RECEIVE_FILM,
-  GET_PERSON
+  GET_PERSON,
+  BACK
 } from './Actions';
 
 const pages = {
@@ -26,12 +28,13 @@ const pendingQueue = (state = 0, action) => {
   }
 };
 
-const currentPage = (state = SHOW_PEOPLE, action) => {
+const currentPerson = (state = 0, action) => {
   switch(action.type) {
+    case BACK:
     case REQUEST_PEOPLE:
-      return SHOW_PEOPLE;
+      return 0;
     case GET_PERSON:
-      return SHOW_PERSON;
+      return action.id;
     default:
       return state;
   }
@@ -40,27 +43,25 @@ const currentPage = (state = SHOW_PEOPLE, action) => {
 const people = (state = [], action) => {
   switch(action.type) {
     case RECEIVE_PEOPLE:
-      return R.over(
-        R.lensProp('films'),
+      return R.map(
         R.pipe(
-          R.map(uriToId),
-          R.reject(isNan)
+          filmListToIds,
+          personUriToId,
         ),
-        action.json
-      );
+        action.json);
     default:
       return state;
   }
 };
 
-const films = (state = [], actions) => {
+const films = (state = [], action) => {
   switch(action.type) {
     case REQUEST_FILM:
-      return R.append({ episode_id: action.id, pending: true }, state);
+      return R.append({ id: action.id, pending: true }, state);
     case RECEIVE_FILM:
       return R.pipe(
-        R.reject(R.propEq('episode_id', action.id)),
-        R.append(action.json)
+        R.reject(R.propEq('id', action.id)),
+        R.append(R.merge(action.json, { id: action.id }))
       )(state);
     default:
       return state;
@@ -69,7 +70,9 @@ const films = (state = [], actions) => {
 
 const app = combineReducers({
   pendingQueue,
-  currentPage,
+  currentPerson,
   people,
   films
 });
+
+export default app;
