@@ -4,51 +4,74 @@ import { filmListToIds, personUriToId } from './Utils';
 import {
   REQUEST_PEOPLE,
   RECEIVE_PEOPLE,
+  RECEIVE_PERSON,
   REQUEST_FILM,
   RECEIVE_FILM,
-  GET_PERSON,
-  BACK
+  BACK,
+  SHOW_ERROR
 } from './Actions';
 
-const pages = {
-  SHOW_PEOPLE: 'SHOW_PEOPLE',
-  SHOW_PERSON: 'SHOW_PERSON'
-};
-
-const pendingQueue = (state = 0, action) => {
-  switch(action.type) {
-    case REQUEST_PEOPLE:
-    case REQUEST_FILM:
-      return state + 1;
-    case RECEIVE_PEOPLE:
-    case RECEIVE_FILM:
-      return state - 1;
-    default:
-      return state
+const characters = [
+  {
+    "name": "Luke Skywalker",
+    "url": "https://swapi.co/api/people/1/",
+    "id": 1
+  }, {
+    "name": "Darth Vader",
+    "url": "https://swapi.co/api/people/4/",
+    "id": 4
+  }, {
+    "name": "Obi-wan Kenobi",
+    "url": "https://swapi.co/api/people/unknown/",
+    "id": "unknown"
+  }, {
+    "name": "R2-D2",
+    "url": "https://swapi.co/api/people/3/",
+    "id": 3
   }
-};
+];
 
-const currentPerson = (state = 0, action) => {
+const error = (state = false, action) => {
   switch(action.type) {
-    case BACK:
-    case REQUEST_PEOPLE:
-      return 0;
-    case GET_PERSON:
-      return action.id;
+    case SHOW_ERROR:
+      return true;
+    case RECEIVE_FILM:
+    case RECEIVE_PERSON:
+      return false;
     default:
       return state;
   }
 };
 
-const people = (state = [], action) => {
+const currentPerson = (state = null, action) => {
+  switch(action.type) {
+    case BACK:
+    case REQUEST_PEOPLE:
+      return null;
+    case RECEIVE_PERSON:
+      return R.pipe(
+          filmListToIds,
+          personUriToId
+        )(action.json);
+    default:
+      return state;
+  }
+};
+
+const people = (state = characters, action) => {
   switch(action.type) {
     case RECEIVE_PEOPLE:
       return R.map(
         R.pipe(
           filmListToIds,
-          personUriToId,
+          personUriToId
         ),
         action.json);
+    case RECEIVE_PERSON:
+        return R.map(p =>
+          p.id === action.id ? R.merge(p, action.json): p,
+          state
+        );
     default:
       return state;
   }
@@ -69,7 +92,7 @@ const films = (state = [], action) => {
 }
 
 const app = combineReducers({
-  pendingQueue,
+  error,
   currentPerson,
   people,
   films

@@ -1,0 +1,7 @@
+.FilmListItem {
+  margin-bottom: 1em;
+}
+
+.FilmListItem strong, .FilmListItem span {
+  display: block;
+}

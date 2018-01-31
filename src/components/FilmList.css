@@ -1,0 +1,16 @@
+.FilmList {
+  background: #222;
+  border-radius: 8px;
+  padding: 1em 2em;
+  width: 50%;
+}
+
+.FilmList h2 {
+  color: rgb(196, 66, 66);
+}
+
+.FilmList-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}

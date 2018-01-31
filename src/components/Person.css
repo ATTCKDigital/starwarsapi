@@ -1,0 +1,45 @@
+.Person {
+  height: 100vh;
+  color: #ccc;
+}
+
+.Person-header {
+  color: #ffd700;
+  margin-bottom: 1em;
+}
+
+.Person-proplist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  padding-bottom: 1em;
+  width: 50%;
+}
+
+.Person-proplist li {
+  margin-bottom: 1em;
+}
+
+.Person-proplist strong {
+  margin-right: 0.5em;
+}
+
+
+.Person-back {
+  color: white;
+  text-decoration: none;
+  transition: color 0.25s;
+  background: none;
+  border: none;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.Person-back:hover {
+  color: rgb(196, 66, 66);
+}
+
+.Person-back::before {
+  content: "\25C0";
+  margin-right: 0.5em;
+}

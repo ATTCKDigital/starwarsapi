@@ -8,21 +8,32 @@ const endpoints = {
 };
 
 export const BACK = 'BACK';
+export const SHOW_ERROR = 'SHOW_ERROR';
 
 export const REQUEST_PEOPLE = 'REQUEST_PEOPLE';
+export const REQUEST_PERSON = 'REQUEST_PERSON';
 export const REQUEST_FILM = 'REQUEST_FILM';
 
 export const RECEIVE_PEOPLE = 'RECEIVE_PEOPLE';
+export const RECEIVE_PERSON = 'RECEIVE_PERSON';
 export const RECEIVE_FILM = 'RECEIVE_FILM';
 
 export const GET_PERSON = 'GET_PERSON';
 
-export const back = () => ({
-  type: BACK
+export const back = () => dispatch => {
+  return dispatch({ type: BACK });
+};
+
+export const showError = () => ({
+  type: SHOW_ERROR
 });
 
 export const requestPeople = () => ({
   type: REQUEST_PEOPLE
+});
+
+export const requestPerson = () => ({
+  type: REQUEST_PERSON
 });
 
 export const requestFilm = (id) => ({
@@ -33,6 +44,11 @@ export const requestFilm = (id) => ({
 export const receivePeople = (json) => ({
   type: RECEIVE_PEOPLE,
   json: json.results
+});
+
+export const receivePerson = (json) => ({
+  type: RECEIVE_PERSON,
+  json: json
 });
 
 export const recieveFilm = (id, json) => ({
@@ -47,13 +63,23 @@ export const getPeople =
 
     return fetch(endpoints.people())
       .then(res => res.json())
-      .then(json => {
-        return dispatch(receivePeople(json))
-      });
+      .then(json => dispatch(receivePeople(json)));
   };
 
 export const getPerson = (id) => dispatch => {
-  dispatch({ type: GET_PERSON, id });
+  window.history.pushState(null, null, id);
+  dispatch(requestPerson());
+
+  return fetch(endpoints.people(id))
+    .then(res => res.json())
+    .then(json => {
+      // error state
+      if(!json.name)
+        return dispatch(showError());
+
+      return dispatch(receivePerson(json))
+    })
+    .catch(() => dispatch(showError()));
 }
 
 export const getFilm = (id) => dispatch => {
@@ -61,9 +87,8 @@ export const getFilm = (id) => dispatch => {
 
   fetch(endpoints.films(id))
     .then(res => res.json())
-    .then(json => {
-      return dispatch(recieveFilm(id, json));
-    })
+    .then(json => dispatch(recieveFilm(id, json)))
+    .catch(() => dispatch(showError()));
 };
 
 export const fetchFilmsForPerson = (person) => dispatch =>

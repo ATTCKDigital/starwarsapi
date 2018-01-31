@@ -1,0 +1,26 @@
+.PersonList {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.PersonList-header {
+  color: #ffd700;
+  margin-bottom: 1em;
+}
+
+.PersonList-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 -1.25em;
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  width: 90vw;
+}
+
+.PersonList-error {
+  color: red;
+  margin-bottom: 1em;
+  text-align: center;
+}
